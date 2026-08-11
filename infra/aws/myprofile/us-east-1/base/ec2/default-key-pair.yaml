@@ -1,0 +1,7 @@
+modules:
+  default_key_pair:
+    source: aws/5/ec2-key-pair
+    vars:
+      ec2_key_pair_public_key: "ssh-ed25519 AAAA_REPLACE_WITH_YOUR_PUBLIC_KEY user@example.com"
+      default_tags:
+        managed_by: terraform

@@ -1,0 +1,54 @@
+modules:
+  bucket:
+    source: aws/5/s3-bucket
+    vars:
+      default_tags:
+        managed_by: terraform
+
+  lock_table:
+    source: aws/5/dynamodb
+    vars:
+      dynamodb_hash_key: LockID
+      default_tags:
+        managed_by: terraform
+
+  app_user:
+    source: aws/5/iam-user
+    vars:
+      iam_user_create_access_key: false
+      default_tags:
+        managed_by: terraform
+
+  app_user_policy:
+    source: aws/5/iam-policy
+    vars:
+      iam_policy_user_name: ${app_user.user_name}
+      iam_policy_statements:
+        - effect: Allow
+          actions: [s3:GetObject, s3:PutObject, s3:DeleteObject, s3:ListBucket]
+          resources:
+            - ${bucket.bucket_arn}
+            - ${bucket.bucket_arn}/*
+        - effect: Allow
+          actions: [dynamodb:PutItem, dynamodb:GetItem, dynamodb:DeleteItem, dynamodb:DescribeTable]
+          resources:
+            - ${lock_table.table_arn}
+
+  cicd_user:
+    source: aws/5/iam-user
+    vars:
+      iam_user_create_access_key: true
+      secrets_manager_name: "myapp/cicd-user"
+      default_tags:
+        managed_by: terraform
+
+  cicd_user_policy:
+    source: aws/5/iam-policy
+    vars:
+      iam_policy_user_name: ${cicd_user.user_name}
+      iam_policy_statements:
+        - effect: Allow
+          actions: [s3:PutObject, s3:DeleteObject, s3:ListBucket]
+          resources:
+            - ${bucket.bucket_arn}
+            - ${bucket.bucket_arn}/*

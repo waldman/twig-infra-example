@@ -1,0 +1,14 @@
+remote_state:
+  vpc:      infra/aws/myprofile/us-east-1/base/vpc/main.yaml
+  key_pair: infra/aws/myprofile/us-east-1/base/ec2/default-key-pair.yaml
+
+modules:
+  ec2:
+    source: aws/5/ec2
+    vars:
+      ec2_ami:       "ami-0c7217cdde317cfec"  # Ubuntu 22.04 us-east-1 — update for your region
+      ec2_vpc_id:    ${vpc.vpc_id}
+      ec2_subnet_id: ${vpc.first_public_subnet_id}
+      ec2_key_name:  ${key_pair.key_name}
+      default_tags:
+        managed_by: terraform

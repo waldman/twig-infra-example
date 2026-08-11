@@ -1,0 +1,9 @@
+modules:
+  vpc:
+    source: aws/5/vpc
+    vars:
+      vpc_cidr_block:         "10.0.0.0/16"
+      vpc_availability_zones: 2
+      vpc_single_nat_gateway: true
+      default_tags:
+        managed_by: terraform
