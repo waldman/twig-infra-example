@@ -1,0 +1,5 @@
+aws:
+  source: hashicorp/aws
+  config:
+    profile: "${profile}"
+    region:  "${region}"
