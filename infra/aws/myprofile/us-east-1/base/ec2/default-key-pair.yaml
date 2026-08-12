@@ -1,3 +1,7 @@
+#
+# default-key-pair.yaml
+#
+
 modules:
   default_key_pair:
     source: aws/5/ec2-key-pair
