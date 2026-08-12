@@ -22,17 +22,17 @@ modules:
   app_user_policy:
     source: aws/5/iam-policy
     vars:
-      iam_policy_user_name: ${app_user.user_name}
+      iam_policy_user_name: ${module.app_user.user_name}
       iam_policy_statements:
         - effect: Allow
           actions: [s3:GetObject, s3:PutObject, s3:DeleteObject, s3:ListBucket]
           resources:
-            - ${bucket.bucket_arn}
-            - ${bucket.bucket_arn}/*
+            - ${module.bucket.bucket_arn}
+            - ${module.bucket.bucket_arn}/*
         - effect: Allow
           actions: [dynamodb:PutItem, dynamodb:GetItem, dynamodb:DeleteItem, dynamodb:DescribeTable]
           resources:
-            - ${lock_table.table_arn}
+            - ${module.lock_table.table_arn}
 
   cicd_user:
     source: aws/5/iam-user
@@ -45,10 +45,10 @@ modules:
   cicd_user_policy:
     source: aws/5/iam-policy
     vars:
-      iam_policy_user_name: ${cicd_user.user_name}
+      iam_policy_user_name: ${module.cicd_user.user_name}
       iam_policy_statements:
         - effect: Allow
           actions: [s3:PutObject, s3:DeleteObject, s3:ListBucket]
           resources:
-            - ${bucket.bucket_arn}
-            - ${bucket.bucket_arn}/*
+            - ${module.bucket.bucket_arn}
+            - ${module.bucket.bucket_arn}/*

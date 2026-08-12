@@ -6,7 +6,7 @@ modules:
   sg:
     source: aws/5/security-group
     vars:
-      sg_vpc_id: ${vpc.vpc_id}
+      sg_vpc_id: ${remote.vpc.vpc_id}
       sg_ingress_rules:
         - from_port: 22
           to_port: 22
@@ -17,9 +17,9 @@ modules:
     source: aws/5/ec2
     vars:
       ec2_ami:                "ami-0c7217cdde317cfec"  # Ubuntu 22.04 us-east-1 — update for your region
-      ec2_subnet_id:          ${vpc.first_public_subnet_id}
+      ec2_subnet_id:          ${remote.vpc.first_public_subnet_id}
       ec2_security_group_ids:
-        - ${sg.security_group_id}
-      ec2_key_name:           ${key_pair.key_name}
+        - ${module.sg.security_group_id}
+      ec2_key_name:           ${remote.key_pair.key_name}
       default_tags:
         managed_by: terraform
