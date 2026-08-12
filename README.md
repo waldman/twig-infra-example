@@ -92,6 +92,7 @@ twig-infra-example/
 │   └── aws/
 │       └── 5/                            # AWS provider major version
 │           ├── vpc/
+│           ├── security-group/
 │           ├── ec2/
 │           ├── ec2-key-pair/
 │           ├── s3-bucket/
@@ -138,15 +139,16 @@ All modules receive 7 path-derived variables automatically from twig:
 
 Module-specific variables are prefixed with the module name (e.g. `vpc_cidr_block`, `ec2_ami`, `s3_bucket_name`).
 
-| Module        | Creates                                              |
-|---------------|------------------------------------------------------|
-| `vpc`         | VPC, public/private subnets, NAT gateway, route tables |
-| `ec2`         | EC2 instance, security group                         |
-| `ec2-key-pair`| AWS key pair from a public key                       |
-| `s3-bucket`   | S3 bucket with versioning and encryption             |
-| `dynamodb`    | DynamoDB table (PAY_PER_REQUEST by default)          |
-| `iam-user`    | IAM user, optional access key → Secrets Manager      |
-| `iam-policy`  | IAM policy document + user attachment                |
+| Module           | Creates                                              |
+|------------------|------------------------------------------------------|
+| `vpc`            | VPC, public/private subnets, NAT gateway, route tables |
+| `security-group` | Security group with configurable ingress rules       |
+| `ec2`            | EC2 instance (takes `ec2_security_group_ids`)        |
+| `ec2-key-pair`   | AWS key pair from a public key                       |
+| `s3-bucket`      | S3 bucket with versioning and encryption             |
+| `dynamodb`       | DynamoDB table (PAY_PER_REQUEST by default)          |
+| `iam-user`       | IAM user, optional access key → Secrets Manager      |
+| `iam-policy`     | IAM policy document + user attachment                |
 
 ## License
 
