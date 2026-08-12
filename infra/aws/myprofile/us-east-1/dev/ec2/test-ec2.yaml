@@ -1,3 +1,7 @@
+#
+# test-ec2.yaml
+#
+
 remote_state:
   vpc:      infra/aws/myprofile/us-east-1/base/vpc/main.yaml
   key_pair: infra/aws/myprofile/us-east-1/base/ec2/default-key-pair.yaml

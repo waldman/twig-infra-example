@@ -1,3 +1,7 @@
+#
+# my-app.yaml
+#
+
 modules:
   bucket:
     source: aws/5/s3-bucket
