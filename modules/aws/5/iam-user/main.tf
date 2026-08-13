@@ -1,7 +1,7 @@
 locals {
-  user_name = "${var.environment}-${var.class}-${var.component}-${var.module}"
-
-  write_secret = var.iam_user_create_access_key && var.secrets_manager_name != null
+  user_name            = "${var.environment}-${var.class}-${var.component}-${var.module}"
+  secrets_manager_name = var.secrets_manager_name != null ? var.secrets_manager_name : "terraform/${var.cloud}/${var.profile}/${var.region}/${var.environment}/${var.class}/${var.component}/${var.module}"
+  write_secret         = var.iam_user_create_access_key
 }
 
 resource "aws_iam_user" "this" {
@@ -34,7 +34,7 @@ resource "aws_iam_access_key" "this" {
 # ---------------------------------------------------------------------------
 resource "aws_secretsmanager_secret" "credentials" {
   count       = local.write_secret ? 1 : 0
-  name        = var.secrets_manager_name
+  name        = local.secrets_manager_name
   description = "IAM user credentials for ${local.user_name} (managed by terraform)"
   tags        = var.default_tags
 }

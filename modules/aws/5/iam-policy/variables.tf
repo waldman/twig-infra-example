@@ -11,11 +11,6 @@ variable "default_tags" {
   default = {}
 }
 
-variable "iam_policy_user_name" {
-  description = "IAM user to attach the policy to."
-  type        = string
-}
-
 variable "iam_policy_statements" {
   description = "List of IAM policy statement objects."
   type = list(object({

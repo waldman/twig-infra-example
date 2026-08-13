@@ -3,8 +3,8 @@
 #
 # Demonstrates every vars.yaml feature:
 #   - Inherited remote_state.vpc from infra/aws/vars.yaml (no local declaration).
-#   - module_defaults."aws/5/ec2" contributes ec2_ami and ec2_subnet_id.
-#   - ${vars.default_tags} pulls the map from infra/vars.yaml.
+#   - module_defaults."aws/5/ec2" contributes ec2_ami, ec2_subnet_id, and default_tags.
+#   - module_defaults."aws/5/security-group" contributes default_tags.
 #
 # The leaf only declares what's actually specific to this instance.
 #
@@ -22,13 +22,11 @@ modules:
           to_port:     22
           protocol:    tcp
           cidr_blocks: ["0.0.0.0/0"]
-      default_tags:  ${vars.default_tags}
 
   ec2:
     source: aws/5/ec2
-    # ec2_ami and ec2_subnet_id come from module_defaults."aws/5/ec2" in infra/aws/vars.yaml.
+    # ec2_ami, ec2_subnet_id, and default_tags come from module_defaults."aws/5/ec2".
     vars:
       ec2_security_group_ids:
         - ${module.sg.security_group_id}
       ec2_key_name:  ${remote.key_pair.key_name}
-      default_tags:  ${vars.default_tags}
