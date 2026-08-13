@@ -1,29 +1,34 @@
 #
 # test-ec2.yaml
 #
+# Demonstrates every vars.yaml feature:
+#   - Inherited remote_state.vpc from infra/aws/vars.yaml (no local declaration).
+#   - module_defaults."aws/5/ec2" contributes ec2_ami and ec2_subnet_id.
+#   - ${vars.default_tags} pulls the map from infra/vars.yaml.
+#
+# The leaf only declares what's actually specific to this instance.
+#
 
 remote_state:
-  vpc:      infra/aws/myprofile/us-east-1/base/vpc/main.yaml
   key_pair: infra/aws/myprofile/us-east-1/base/ec2/default-key-pair.yaml
 
 modules:
   sg:
     source: aws/5/security-group
     vars:
-      sg_vpc_id: ${remote.vpc.vpc_id}
+      sg_vpc_id:     ${remote.vpc.vpc_id}          # from inherited remote_state.vpc
       sg_ingress_rules:
-        - from_port: 22
-          to_port: 22
-          protocol: tcp
+        - from_port:   22
+          to_port:     22
+          protocol:    tcp
           cidr_blocks: ["0.0.0.0/0"]
+      default_tags:  ${vars.default_tags}
 
   ec2:
     source: aws/5/ec2
+    # ec2_ami and ec2_subnet_id come from module_defaults."aws/5/ec2" in infra/aws/vars.yaml.
     vars:
-      ec2_ami:                "ami-0c7217cdde317cfec"  # Ubuntu 22.04 us-east-1 — update for your region
-      ec2_subnet_id:          ${remote.vpc.first_public_subnet_id}
       ec2_security_group_ids:
         - ${module.sg.security_group_id}
-      ec2_key_name:           ${remote.key_pair.key_name}
-      default_tags:
-        managed_by: terraform
+      ec2_key_name:  ${remote.key_pair.key_name}
+      default_tags:  ${vars.default_tags}

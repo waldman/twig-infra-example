@@ -1,0 +1,11 @@
+#
+# infra/vars.yaml — top-level, applies to every leaf in the tree.
+#
+# Only the `vars:` section here — a single cross-cutting value referenced
+# by every leaf via ${vars.default_tags}. This is the reference-only path:
+# nothing is auto-injected. Leaves have to opt in.
+#
+
+vars:
+  default_tags:
+    managed_by: terraform
