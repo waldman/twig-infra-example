@@ -9,4 +9,3 @@ modules:
       vpc_cidr_block:         "10.0.0.0/16"
       vpc_availability_zones: 2
       vpc_single_nat_gateway: true
-      default_tags:           ${vars.default_tags}    # from infra/vars.yaml

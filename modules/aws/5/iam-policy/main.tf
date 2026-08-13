@@ -19,7 +19,3 @@ resource "aws_iam_policy" "this" {
   tags   = var.default_tags
 }
 
-resource "aws_iam_user_policy_attachment" "this" {
-  user       = var.iam_policy_user_name
-  policy_arn = aws_iam_policy.this.arn
-}
