@@ -4,7 +4,7 @@ Reference implementation for [twig](https://github.com/waldman/twig) — a thin 
 
 This repo provides:
 - **7 reusable AWS Terraform modules** (`modules/aws/5/`)
-- **4 example leaves** that exercise all modules, including cross-leaf `remote_state` references
+- **4 example leaves** that exercise all modules, cross-leaf `remote_state` references, and every `vars.yaml` section (`vars:`, `remote_state:`, `module_defaults:`)
 
 Use it as a starter template, or reference the modules from any twig project via git URL.
 
@@ -100,16 +100,55 @@ twig-infra-example/
 │           ├── iam-user/
 │           └── iam-policy/
 └── infra/
+    ├── vars.yaml                             # top-level: shared `vars:` (default_tags)
     └── aws/
+        ├── vars.yaml                         # AWS-scoped: `remote_state:` + `module_defaults:`
         └── myprofile/
             └── us-east-1/
                 ├── base/
                 │   ├── vpc/main.yaml              # VPC + subnets + NAT
                 │   └── ec2/default-key-pair.yaml  # SSH key pair
                 └── dev/
-                    ├── ec2/test-ec2.yaml           # EC2 instance (cross-leaf refs)
+                    ├── ec2/test-ec2.yaml           # EC2 instance — uses every inheritance feature
                     └── services/my-app.yaml        # S3 + DynamoDB + IAM users/policies
 ```
+
+## Inheritance via `vars.yaml`
+
+Two `vars.yaml` files demonstrate the three sections. Each level of the tree can define any of them; leaves inherit everything above.
+
+### `infra/vars.yaml` — universal
+
+```yaml
+vars:
+  default_tags:
+    managed_by: terraform
+```
+
+`default_tags` is referenced by every leaf via `${vars.default_tags}` — one source of truth for the map, explicit opt-in per module (twig does not auto-inject `vars:` values).
+
+### `infra/aws/vars.yaml` — AWS-scoped
+
+```yaml
+remote_state:
+  vpc: infra/aws/myprofile/us-east-1/base/vpc/main.yaml
+
+module_defaults:
+  aws/5/ec2:
+    ec2_ami:       "ami-0c7217cdde317cfec"                 # update for your region
+    ec2_subnet_id: ${remote.vpc.first_public_subnet_id}
+```
+
+- **`remote_state:`** — every AWS leaf below can reference `${remote.vpc.<field>}` without redeclaring the alias. The `data "terraform_remote_state" "vpc"` block is emitted only in leaves that actually reference it (lazy emission — `my-app.yaml` inherits the alias but produces no data block).
+- **`module_defaults."aws/5/ec2"`** — every module whose `source: aws/5/ec2` receives these vars automatically. Leaf `vars:` overrides per key. References inside module_defaults values resolve at generate time against the consuming leaf.
+
+See [`test-ec2.yaml`](infra/aws/myprofile/us-east-1/dev/ec2/test-ec2.yaml) — it declares no `remote_state.vpc`, no `ec2_ami`, no `ec2_subnet_id`. All three come from inherited `vars.yaml` files.
+
+Full reference: [twig docs/vars-yaml.md](https://github.com/waldman/twig/blob/master/docs/vars-yaml.md).
+
+## Provenance
+
+Every argument in the generated `main.tf` carries a trailing `# from: <origin>` comment. Run `twig show <leaf>` and you can trace any value to `path`, `leaf: modules.<x>.vars`, or `<path>: module_defaults."<source>"` in one step.
 
 ## Using these modules from another project
 

@@ -6,22 +6,19 @@ modules:
   bucket:
     source: aws/5/s3-bucket
     vars:
-      default_tags:
-        managed_by: terraform
+      default_tags: ${vars.default_tags}    # from infra/vars.yaml
 
   lock_table:
     source: aws/5/dynamodb
     vars:
       dynamodb_hash_key: LockID
-      default_tags:
-        managed_by: terraform
+      default_tags:      ${vars.default_tags}
 
   app_user:
     source: aws/5/iam-user
     vars:
       iam_user_create_access_key: false
-      default_tags:
-        managed_by: terraform
+      default_tags:               ${vars.default_tags}
 
   app_user_policy:
     source: aws/5/iam-policy
@@ -42,9 +39,8 @@ modules:
     source: aws/5/iam-user
     vars:
       iam_user_create_access_key: true
-      secrets_manager_name: "myapp/cicd-user"
-      default_tags:
-        managed_by: terraform
+      secrets_manager_name:       "myapp/cicd-user"
+      default_tags:               ${vars.default_tags}
 
   cicd_user_policy:
     source: aws/5/iam-policy
