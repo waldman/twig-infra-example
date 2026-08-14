@@ -10,9 +10,9 @@ resource "aws_iam_user" "this" {
 }
 
 resource "aws_iam_user_policy_attachment" "managed" {
-  for_each   = toset(var.iam_user_attach_policy_arns)
+  count      = length(var.iam_user_attach_policy_arns)
   user       = aws_iam_user.this.name
-  policy_arn = each.value
+  policy_arn = var.iam_user_attach_policy_arns[count.index]
 }
 
 resource "aws_iam_user_policy" "inline" {
