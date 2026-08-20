@@ -18,38 +18,25 @@ Use it as a starter template, or reference the modules from any twig project via
 
 ### 1. Bootstrap state infrastructure (one-time)
 
-twig uses an S3 backend. Create the bucket and optional DynamoDB lock table before running any leaves:
+The `bootstrap/` directory is a small vanilla Terraform module (no twig, no
+backend block) that creates the S3 state bucket and DynamoDB lock table:
 
 ```bash
-PROFILE=myprofile
-BUCKET=my-terraform-state
-REGION=us-east-1
-TABLE=my-terraform-locks
-
-aws --profile $PROFILE s3api create-bucket \
-    --bucket $BUCKET --region $REGION
-
-aws --profile $PROFILE s3api put-bucket-versioning \
-    --bucket $BUCKET \
-    --versioning-configuration Status=Enabled
-
-aws --profile $PROFILE s3api put-bucket-encryption \
-    --bucket $BUCKET \
-    --server-side-encryption-configuration \
-    '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"AES256"}}]}'
-
-aws --profile $PROFILE s3api put-public-access-block \
-    --bucket $BUCKET \
-    --public-access-block-configuration \
-    "BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true"
-
-aws --profile $PROFILE dynamodb create-table \
-    --table-name $TABLE \
-    --attribute-definitions AttributeName=LockID,AttributeType=S \
-    --key-schema AttributeName=LockID,KeyType=HASH \
-    --billing-mode PAY_PER_REQUEST \
-    --region $REGION
+cd bootstrap/
+terraform init
+terraform apply -var="profile=myprofile" -var="bucket_name=my-terraform-state"
 ```
+
+Outputs give you exactly what to paste into `twig.yaml`. After apply, commit
+the state file — it contains no secrets:
+
+```bash
+git add bootstrap/terraform.tfstate bootstrap/.gitignore
+git commit -m "bootstrap: state backend created"
+```
+
+The `bootstrap/` directory is frozen after this. Do not run plan or apply
+again unless intentionally recreating the backend.
 
 ### 2. Configure this repo
 
@@ -87,6 +74,12 @@ twig apply infra/aws/myprofile/us-east-1/dev/ec2/test-ec2.yaml
 
 ```
 twig-infra-example/
+├── bootstrap/                             # one-time state backend setup (run once, then frozen)
+│   ├── versions.tf
+│   ├── variables.tf
+│   ├── main.tf
+│   ├── outputs.tf
+│   └── .gitignore                         # un-ignores terraform.tfstate
 ├── twig.yaml                              # backend config + modules path
 ├── modules/
 │   └── aws/
