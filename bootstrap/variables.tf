@@ -11,8 +11,3 @@ variable "bucket_name" {
   type     = string
   nullable = false
 }
-
-variable "dynamodb_table_name" {
-  type    = string
-  default = "terraform-locks"
-}

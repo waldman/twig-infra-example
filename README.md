@@ -11,7 +11,7 @@ Use it as a starter template, or reference the modules from any twig project via
 ## Prerequisites
 
 - [twig](https://github.com/waldman/twig/releases) in `$PATH`
-- [Terraform](https://developer.hashicorp.com/terraform/install) `>= 1.1` in `$PATH`
+- [Terraform](https://developer.hashicorp.com/terraform/install) `>= 1.10` in `$PATH`
 - AWS credentials configured with a named profile in `~/.aws/credentials`
 
 ## Quick start
@@ -19,7 +19,7 @@ Use it as a starter template, or reference the modules from any twig project via
 ### 1. Bootstrap state infrastructure (one-time)
 
 The `bootstrap/` directory is a small vanilla Terraform module (no twig, no
-backend block) that creates the S3 state bucket and DynamoDB lock table:
+backend block) that creates the S3 state bucket:
 
 ```bash
 cd bootstrap/
@@ -46,10 +46,10 @@ Edit `twig.yaml` to match your setup:
 modules_path: ./modules
 
 backend:
-  bucket:         my-terraform-state   # your state bucket
-  region:         us-east-1
-  dynamodb_table: my-terraform-locks   # optional
-  profile:        myprofile            # your AWS profile
+  bucket:       my-terraform-state   # your state bucket
+  region:       us-east-1
+  profile:      myprofile            # your AWS profile
+  use_lockfile: true
 ```
 
 Rename `infra/aws/myprofile/` to match your AWS profile name.
