@@ -5,7 +5,7 @@
 modules_path: ./modules
 
 backend:
-  bucket:         my-terraform-state
-  region:         us-east-1
-  dynamodb_table: my-terraform-locks
-  profile:        myprofile
+  bucket:       my-terraform-state
+  region:       us-east-1
+  profile:      myprofile
+  use_lockfile: true
