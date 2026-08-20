@@ -1,0 +1,7 @@
+# Terraform working directories — excluded globally
+.terraform/
+.terraform.lock.hcl
+*.tfplan
+
+# State file committed intentionally for bootstrap (no secrets; records what was created)
+!terraform.tfstate
