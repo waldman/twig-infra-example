@@ -2,18 +2,18 @@
 # infra/aws/vars.yaml — AWS-scoped, applies to every leaf under infra/aws/.
 #
 # Demonstrates:
-#   - `remote_state:`  inherited alias so downstream leaves can reference
+#   - `remotes:`  inherited alias so downstream leaves can reference
 #                      the VPC without redeclaring the path.
 #   - `module_defaults:` per-source defaults injected into any module
 #                      whose source: matches the key exactly. Leaves may
 #                      still override per-key in modules.<instance>.vars.
 #
-# Note the ${remote.vpc.first_public_subnet_id} inside module_defaults —
+# Note the ${remotes.vpc.first_public_subnet_id} inside module_defaults —
 # references ARE allowed here (unlike in `vars:` values above). Resolved
-# at generate time against the consuming leaf's effective remote_state.
+# at generate time against the consuming leaf's effective remotes.
 #
 
-remote_state:
+remotes:
   vpc: infra/aws/myprofile/us-east-1/base/vpc/main.yaml
 
 module_defaults:
@@ -21,7 +21,7 @@ module_defaults:
     default_tags: ${vars.default_tags}
   aws/5/ec2:
     ec2_ami:       "ami-0c7217cdde317cfec"                # Ubuntu 22.04 us-east-1 — update for your region
-    ec2_subnet_id: ${remote.vpc.first_public_subnet_id}
+    ec2_subnet_id: ${remotes.vpc.first_public_subnet_id}
     default_tags:  ${vars.default_tags}
   aws/5/ec2-key-pair:
     default_tags: ${vars.default_tags}
