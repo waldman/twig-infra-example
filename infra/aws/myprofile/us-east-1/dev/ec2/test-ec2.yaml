@@ -2,21 +2,21 @@
 # test-ec2.yaml
 #
 # Demonstrates every vars.yaml feature:
-#   - Inherited remote_state.vpc from infra/aws/vars.yaml (no local declaration).
+#   - Inherited remotes.vpc from infra/aws/vars.yaml (no local declaration).
 #   - module_defaults."aws/5/ec2" contributes ec2_ami, ec2_subnet_id, and default_tags.
 #   - module_defaults."aws/5/security-group" contributes default_tags.
 #
 # The leaf only declares what's actually specific to this instance.
 #
 
-remote_state:
+remotes:
   key_pair: infra/aws/myprofile/us-east-1/base/ec2/default-key-pair.yaml
 
 modules:
   sg:
     source: aws/5/security-group
     vars:
-      sg_vpc_id:     ${remote.vpc.vpc_id}          # from inherited remote_state.vpc
+      sg_vpc_id:     ${remotes.vpc.vpc_id}          # from inherited remotes.vpc
       sg_ingress_rules:
         - from_port:   22
           to_port:     22
@@ -28,5 +28,5 @@ modules:
     # ec2_ami, ec2_subnet_id, and default_tags come from module_defaults."aws/5/ec2".
     vars:
       ec2_security_group_ids:
-        - ${module.sg.security_group_id}
-      ec2_key_name:  ${remote.key_pair.key_name}
+        - ${modules.sg.security_group_id}
+      ec2_key_name:  ${remotes.key_pair.key_name}
