@@ -4,7 +4,7 @@ Reference implementation for [twig](https://github.com/waldman/twig) — a thin 
 
 This repo provides:
 - **7 reusable AWS Terraform modules** (`modules/aws/5/`)
-- **4 example leaves** that exercise all modules, cross-leaf `remote_state` references, and every `vars.yaml` section (`vars:`, `remote_state:`, `module_defaults:`)
+- **4 example leaves** that exercise all modules, cross-leaf `remotes` references, and every `vars.yaml` section (`vars:`, `remotes:`, `module_defaults:`)
 
 Use it as a starter template, or reference the modules from any twig project via git URL.
 
@@ -95,7 +95,7 @@ twig-infra-example/
 └── infra/
     ├── vars.yaml                             # top-level: shared `vars:` (default_tags)
     └── aws/
-        ├── vars.yaml                         # AWS-scoped: `remote_state:` + `module_defaults:`
+        ├── vars.yaml                         # AWS-scoped: `remotes:` + `module_defaults:`
         └── myprofile/
             └── us-east-1/
                 ├── base/
@@ -123,19 +123,19 @@ vars:
 ### `infra/aws/vars.yaml` — AWS-scoped
 
 ```yaml
-remote_state:
+remotes:
   vpc: infra/aws/myprofile/us-east-1/base/vpc/main.yaml
 
 module_defaults:
   aws/5/ec2:
     ec2_ami:       "ami-0c7217cdde317cfec"                 # update for your region
-    ec2_subnet_id: ${remote.vpc.first_public_subnet_id}
+    ec2_subnet_id: ${remotes.vpc.vpc.first_public_subnet_id}
 ```
 
-- **`remote_state:`** — every AWS leaf below can reference `${remote.vpc.<field>}` without redeclaring the alias. The `data "terraform_remote_state" "vpc"` block is emitted only in leaves that actually reference it (lazy emission — `my-app.yaml` inherits the alias but produces no data block).
+- **`remotes:`** — every AWS leaf below can reference `${remotes.vpc.vpc.<output>}` without redeclaring the alias. The first `vpc` is the alias; the second is the module key in the producer leaf (`modules.vpc` in `base/vpc/main.yaml`), since every leaf exposes one root output per module instance. The `data "terraform_remote_state" "vpc"` block is emitted only in leaves that actually reference it (lazy emission — `my-app.yaml` inherits the alias but produces no data block).
 - **`module_defaults."aws/5/ec2"`** — every module whose `source: aws/5/ec2` receives these vars automatically. Leaf `vars:` overrides per key. References inside module_defaults values resolve at generate time against the consuming leaf.
 
-See [`test-ec2.yaml`](infra/aws/myprofile/us-east-1/dev/ec2/test-ec2.yaml) — it declares no `remote_state.vpc`, no `ec2_ami`, no `ec2_subnet_id`. All three come from inherited `vars.yaml` files.
+See [`test-ec2.yaml`](infra/aws/myprofile/us-east-1/dev/ec2/test-ec2.yaml) — it declares no `remotes.vpc`, no `ec2_ami`, no `ec2_subnet_id`. All three come from inherited `vars.yaml` files.
 
 Full reference: [twig docs/vars-yaml.md](https://github.com/waldman/twig/blob/master/docs/vars-yaml.md).
 
